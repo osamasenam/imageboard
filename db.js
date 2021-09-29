@@ -26,8 +26,15 @@ module.exports.getImages = () => {
     return db.query(q);
 };
 
+module.exports.getImage = (id) => {
+    const q = `SELECT * FROM images WHERE id=$1`;
+    const params = [id];
+    return db.query(q,params);
+};
+
 module.exports.postImage = (req, res, next) => { 
     const q = `INSERT INTO images (url, username, title, description) VALUES ($1, $2, $3, $4)`;
     const params = [`https://s3.amazonaws.com/spicedling/${req.file.filename}`, req.body.username, req.body.title , req.body.description];
-    return db.query(q, params);
+    return db.query(q, params).then(() => next());
+    
 }
