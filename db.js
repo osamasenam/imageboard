@@ -22,7 +22,23 @@ console.log(`db connecting to: ${database}`);
 
 
 module.exports.getImages = () => {
-    const q = `SELECT * FROM images ORDER BY created_at DESC`;
+    const q = `SELECT * FROM images ORDER BY created_at DESC LIMIT 6`;
+    return db.query(q);
+};
+
+module.exports.getFirstId = () => {
+    const q = `SELECT id FROM images ORDER BY created_at ASC LIMIT 1`;
+    return db.query(q);
+};
+
+module.exports.getMoreImages = (lastId) => {
+    const q = `SELECT * FROM images WHERE id < $1 ORDER BY created_at DESC  LIMIT 6`;
+    const params = [lastId];
+    return db.query(q,params);
+};
+
+module.exports.getLastImage = () => {
+    const q = `SELECT * FROM images ORDER BY created_at DESC LIMIT 1`;
     return db.query(q);
 };
 
@@ -38,3 +54,22 @@ module.exports.postImage = (req, res, next) => {
     return db.query(q, params).then(() => next());
     
 }
+
+module.exports.getComments = (id) => {
+    const q = `SELECT * FROM comments WHERE image_id=$1`;
+    const params = [id];
+    return db.query(q,params);
+};
+
+module.exports.postComment = (req, res, next) => { 
+    console.log("req.body.username",req.body.username);
+    const q = `INSERT INTO comments (image_id, username, comment) VALUES ($1, $2, $3)`;
+    const params = [req.body.id, req.body.username, req.body.comment];
+    return db.query(q, params).then(() => next());
+    
+}
+
+module.exports.getLastComment = () => {
+    const q = `SELECT * FROM comments ORDER BY created_at DESC LIMIT 1`;
+    return db.query(q);
+};

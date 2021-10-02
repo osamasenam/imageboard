@@ -1,6 +1,5 @@
 import * as Vue from './vue.js';
-import { myComponent } from "./my-component.js";
-
+import { componentModal } from "./component-modal.js";
 
 Vue.createApp({
     data() {
@@ -11,17 +10,13 @@ Vue.createApp({
             username: '',
             file: null,
             img_id: '',
-            img_title: '',
-            img_url: '',
-            img_description: '',
-            img_username: '',
-            img_created_at: '',
-            modal_visibility: 'hidden',
+            showMoreFlag: true,
+
         };
     },
    
     mounted() {
-        console.log("MOUNTED");
+        console.log("vue app MOUNTED");
         fetch("/imageboard")
             .then((response) => response.json())
             .then((data) => {
@@ -32,7 +27,7 @@ Vue.createApp({
     },
     
     methods: {
-        clickHandler() {
+        submitBtnHandler() {
             console.log(this);
             // uploading the file logic here
             const fd = new FormData();
@@ -47,9 +42,8 @@ Vue.createApp({
             })
             .then(response => response.json())
             .then(result => {
-                console.log(result); 
-                console.log("updated images:", result);
-                this.images = result;
+                console.log("Last added image id",result[0].id); 
+                this.images.unshift(result[0]);
             })
             .catch(err => console.log(err))
         },
@@ -58,30 +52,39 @@ Vue.createApp({
             this.file = e.target.files[0];
         },
         openModal(e) {
+            this.img_id  = e.target.id;
             console.log("clicked image", e.target.id);
-            const imgId = e.target.id;
-            fetch(`/openImage/${imgId}`)
-            .then((response) => response.json())
-            .then((data) => {
-                console.log("clicked image:", data[0]);
-                this.img_id = data[0].id ;
-                this.img_title = data[0].title ;
-                this.img_url = data[0].url ;
-                this.img_description = data[0].description ;
-                this.img_username = data[0].username ;
-                this.img_created_at = data[0].created_at ;
-                this.modal_visibility = "visible"
-            })
-            .catch(console.log);
+            this.modal_visibility = "visible"
             
         },
         closeModal() {
             console.log("closing modal");
-            this.modal_visibility = "hidden"   
-        }
+            this.img_id = null;
+        },
+        showMoreImages() {
+            console.log("showing more images");
+            // we need to grab more photos past this last id already shown at the end of our page
+            const lastId = this.images[this.images.length -1].id;
+            fetch(`/showMoreImages/${lastId}`)
+            .then((response) => response.json())
+            .then((data) => {
+                // save the last image id to know if all images are shown already or not yet
+                const firstIdInMore = data[data.length-1].id; 
+                this.images = this.images.concat(data);
+                // get the id of the first image in db to know when more Btn should disappear
+                fetch(`/getFirstId`)
+                .then((response) => response.json())
+                .then((firstId) => {
+                    this.showMoreFlag = (firstId[0].id == firstIdInMore) ? false : true;
+                    console.log("this.showMoreFlag", this.showMoreFlag);
+                })
+                .catch(console.log);
+            })
+            .catch(console.log);
+        },
     },
 
     components: {
-        "my-component": myComponent,
+        "component-modal": componentModal,
     }
 }).mount("#main");

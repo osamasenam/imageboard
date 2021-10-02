@@ -11,11 +11,9 @@
             <h1>Photo🥢Chop </h1>
         </header>
 
-        <div :style="'visibility:' + modal_visibility" class="overlay" @click="closeModal">
-        </div>
-
+        <component-modal v-if="img_id" :img_id="img_id" @close="closeModal">
+        </component-modal>
         
-        <my-component :style="'visibility:' + modal_visibility" :id="img_id" :title="img_title" :url="img_url" :description="img_description" :username="img_username" :created_at="img_created_at"></my-component>
         
 
         <form>
@@ -23,7 +21,7 @@
             <input v-model="description" type="text" name="description" placeholder="description">
             <input v-model="username" type="text" name="username" placeholder="username">
             <input @change="fileSelectHandler" type="file" name="file" accept="image/*">
-            <button @click.prevent="clickHandler">Submit</button>
+            <button @click.prevent="submitBtnHandler">Submit</button>
         </form>
         
         <div class="container">
@@ -34,6 +32,9 @@
             </div>
         </div>
 
+        <div>
+            <button v-if="showMoreFlag" class="moreBtn" @click="showMoreImages">More</button>
+        </div>
         
 
     </div>
