@@ -40,6 +40,19 @@ const componentComments = {
         },
     },
     props: ["img_id"],
+    watch: {
+        img_id: function() {
+            console.log("watcher handled", this.img_id);
+            fetch(`/comments/${this.img_id}`)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("comments:", data);
+                this.comments = data;
+            })
+            .catch(console.log);
+        
+        }
+    },
     template: `
             <div class="comments">
             <p>Add Comment: </p>

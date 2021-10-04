@@ -9,14 +9,21 @@ Vue.createApp({
             description: '',
             username: '',
             file: null,
-            img_id: '',
+            img_id: location.pathname.slice(1),
             showMoreFlag: true,
-
+            
         };
     },
    
     mounted() {
-        console.log("vue app MOUNTED");
+        console.log("vue app MOUNTED img_id", this.img_id);
+
+        addEventListener('popstate', e => {
+            console.log("page navigation buttons used", location.pathname, e.state);
+            this.img_id = location.pathname.slice(1);
+            // if you need it, e.state has the data you passed to `pushState`
+        });
+
         fetch("/imageboard")
             .then((response) => response.json())
             .then((data) => {
@@ -54,12 +61,44 @@ Vue.createApp({
         openModal(e) {
             this.img_id  = e.target.id;
             console.log("clicked image", e.target.id);
-            this.modal_visibility = "visible"
+            history.pushState({}, '', `/${this.img_id}`);
+            // this.modal_visibility = "visible"
             
         },
         closeModal() {
             console.log("closing modal");
             this.img_id = null;
+            history.pushState({}, '', `/`);
+        },
+        nextModal(arg1) {
+            console.log("next id=", arg1);
+            this.img_id = null;
+            history.pushState({}, '', `/`);
+            this.img_id = arg1;
+            console.log("this.img_id=", this.img_id);
+        },
+        previousModal(arg1) {
+            console.log("next id=", arg1);
+            this.img_id = null;
+            history.pushState({}, '', `/`);
+            this.img_id = arg1;
+            console.log("this.img_id=", this.img_id);
+        },
+        showTaggedImages2(arg1) {
+            console.log("tagged test App vue", arg1);
+            this.img_id = null;
+            history.pushState({}, '', `/`);
+
+            this.showMoreFlag = false;
+            
+            fetch(`/imageboard/${arg1}`)
+            .then((response) => response.json())
+            .then((data) => {
+                console.log("images:", data);
+                this.images = data;
+            })
+            .catch(console.log);
+            
         },
         showMoreImages() {
             console.log("showing more images");

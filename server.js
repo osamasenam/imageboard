@@ -100,6 +100,46 @@ app.get("/comments/:imgId", (req, res) => {
     
 });
 
+app.post('/postTag', db.postTag, (req, res) => {
+    console.log("req.body", req.body);
+    db.getLastTag()
+    .then((dbResults) => {
+        res.json(dbResults.rows);
+    })
+    .catch((err) => {
+        console.log("err in db.getLastTag: ", err);
+        res.send("Database Error!");
+    });
+});
+
+
+app.get("/tags/:imgId", (req, res) => {
+    db.getTags(req.params.imgId)
+    .then((dbResults) => {
+        console.log("Got tags from db successfully");
+        res.json(dbResults.rows);
+    })
+    .catch((err) => {
+        console.log("err in db.getTags: ", err);
+        res.send("Database Error!");
+    });
+    
+});
+
+app.get("/imageboard/:tag", (req, res) => {
+    console.log("req.params.tag",req.params.tag)
+    db.getImagesTag(req.params.tag)
+    .then((dbResults) => {
+        console.log("Got Tagged images from db successfully");
+        res.json(dbResults.rows);
+    })
+    .catch((err) => {
+        console.log("err in db.getImagesTag: ", err);
+        res.send("Database Error!");
+    });
+    
+});
+
 app.get('*', (req, res) => {
     res.sendFile(`${__dirname}/index.html`);
 });

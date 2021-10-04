@@ -11,7 +11,7 @@
             <h1>Photo🥢Chop </h1>
         </header>
 
-        <component-modal v-if="img_id" :img_id="img_id" @close="closeModal">
+        <component-modal v-if="img_id" :img_id="img_id" @close="closeModal" @next="nextModal" @previous="previousModal" @tagged2="showTaggedImages2">
         </component-modal>
         
         
@@ -38,6 +38,7 @@
         
 
     </div>
+
     <script src="/js/app.js" type="module" crossorigin="use-credentials"></script>
 </body>
 </html>

@@ -43,7 +43,10 @@ module.exports.getLastImage = () => {
 };
 
 module.exports.getImage = (id) => {
-    const q = `SELECT * FROM images WHERE id=$1`;
+    const q = `SELECT *, 
+            (SELECT id FROM images WHERE id>$1 LIMIT 1) AS next_id, 
+            (SELECT id FROM images WHERE id<$1 ORDER BY created_at DESC LIMIT 1) AS previous_id 
+            FROM images WHERE id=$1`;
     const params = [id];
     return db.query(q,params);
 };
@@ -62,7 +65,6 @@ module.exports.getComments = (id) => {
 };
 
 module.exports.postComment = (req, res, next) => { 
-    console.log("req.body.username",req.body.username);
     const q = `INSERT INTO comments (image_id, username, comment) VALUES ($1, $2, $3)`;
     const params = [req.body.id, req.body.username, req.body.comment];
     return db.query(q, params).then(() => next());
@@ -73,3 +75,40 @@ module.exports.getLastComment = () => {
     const q = `SELECT * FROM comments ORDER BY created_at DESC LIMIT 1`;
     return db.query(q);
 };
+
+
+module.exports.getTags = (id) => {
+    const q = `SELECT * FROM tags WHERE image_id=$1`;
+    const params = [id];
+    return db.query(q,params);
+};
+
+module.exports.postTag = (req, res, next) => { 
+    const q = `INSERT INTO tags (image_id, tag) VALUES ($1, $2)`;
+    const params = [req.body.id, req.body.tag];
+    return db.query(q, params).then(() => next());
+    
+}
+
+module.exports.getLastTag = () => {
+    const q = `SELECT * FROM tags ORDER BY created_at DESC LIMIT 1`;
+    return db.query(q);
+};
+
+module.exports.getImagesTag = (tag) => {
+    const q = `SELECT images.id, url, username, title, description, images.created_at FROM images 
+            LEFT OUTER JOIN tags 
+            ON tags.image_id=images.id 
+            WHERE tag=$1`;
+    const params = [tag];
+    return db.query(q, params);
+};
+
+// module.exports.getNextImage = (id) => {
+//     const q = `SELECT *, 
+//             (SELECT id FROM images WHERE id>$1 LIMIT 1) AS next_id, 
+//             (SELECT id FROM images WHERE id<$1 ORDER BY created_at DESC LIMIT 1) AS previous_id 
+//             FROM images WHERE id=$1`;
+//     const params = [id];
+//     return db.query(q,params);
+// };
