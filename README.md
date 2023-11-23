@@ -7,6 +7,5 @@ Image Board – similar to Instagram
 
 - Click on More button to view more images
 
-![alt text](https://developer-osama.herokuapp.com/image-board1.png)
-![alt text](https://developer-osama.herokuapp.com/image-board2.png)
+![image-board2 (1)](https://github.com/osamasenam/imageboard/assets/71031601/d52f5e1d-99e2-4e28-81a7-a1d6d3e2e638)
 
